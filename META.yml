@@ -1,6 +1,6 @@
 ---
 name: Config-Any
-version: 0.04
+version: 0.05
 author:
   - 'Joel Bernstein <rataxis@cpan.org>'
 abstract: 'Load configuration from different file formats, transparently'
@@ -14,7 +14,7 @@ requires:
 provides:
   Config::Any:
     file: lib/Config/Any.pm
-    version: 0.04
+    version: 0.05
   Config::Any::General:
     file: lib/Config/Any/General.pm
   Config::Any::INI:
@@ -27,7 +27,7 @@ provides:
     file: lib/Config/Any/XML.pm
   Config::Any::YAML:
     file: lib/Config/Any/YAML.pm
-generated_by: Module::Build version 0.2805
+generated_by: Module::Build version 0.2806
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
   version: 1.2
