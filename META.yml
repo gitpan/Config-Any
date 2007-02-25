@@ -1,6 +1,6 @@
 ---
 name: Config-Any
-version: 0.06
+version: 0.06_01
 author:
   - 'Joel Bernstein <rataxis@cpan.org>'
 abstract: 'Load configuration from different file formats, transparently'
@@ -14,7 +14,7 @@ requires:
 provides:
   Config::Any:
     file: lib/Config/Any.pm
-    version: 0.06
+    version: 0.06_01
   Config::Any::General:
     file: lib/Config/Any/General.pm
   Config::Any::INI:
