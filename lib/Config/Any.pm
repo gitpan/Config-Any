@@ -6,7 +6,7 @@ use Carp;
 use Module::Pluggable::Object ();
 use English qw(-no_match_vars);
 
-our $VERSION = '0.06_01';
+our $VERSION = '0.07';
 
 =head1 NAME
 
@@ -14,7 +14,7 @@ Config::Any - Load configuration from different file formats, transparently
 
 =head1 VERSION
 
-This document describes Config::Any version 0.0.5
+This document describes Config::Any version 0.0.7
 
 =head1 SYNOPSIS
 
