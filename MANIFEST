@@ -1,5 +1,15 @@
-Build.PL
 Changes
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
 lib/Config/Any.pm
 lib/Config/Any/General.pm
 lib/Config/Any/INI.pm
@@ -9,6 +19,7 @@ lib/Config/Any/XML.pm
 lib/Config/Any/YAML.pm
 Makefile.PL
 MANIFEST			This list of files
+META.yml
 README
 t/01-use.t
 t/10-branches.t
@@ -30,4 +41,3 @@ t/conf/conf.yml
 t/conf/conf2.ini
 t/pod-coverage.t
 t/pod.t
-META.yml

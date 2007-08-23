@@ -6,7 +6,7 @@ use Carp;
 use Module::Pluggable::Object ();
 use English qw(-no_match_vars);
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 NAME
 
@@ -14,21 +14,21 @@ Config::Any - Load configuration from different file formats, transparently
 
 =head1 VERSION
 
-This document describes Config::Any version 0.0.7
+This document describes Config::Any version 0.0.8
 
 =head1 SYNOPSIS
 
     use Config::Any;
 
-	my $cfg = Config::Any->load_stems({stems => \@filepath_stems, ... });
-	# or
-	my $cfg = Config::Any->load_files({files => \@filepaths, ... });
+    my $cfg = Config::Any->load_stems({stems => \@filepath_stems, ... });
+    # or
+    my $cfg = Config::Any->load_files({files => \@filepaths, ... });
 
-	for (@$cfg) {
-		my ($filename, $config) = each %$_;
-		$class->config($config);
-		warn "loaded config from file: $filename";
-	}
+    for (@$cfg) {
+        my ($filename, $config) = each %$_;
+        $class->config($config);
+        warn "loaded config from file: $filename";
+    }
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ configuration formats.
 
 =head2 load_files( )
 
-    Config::Any->load_files({files => \@files]});
+    Config::Any->load_files({files => \@files});
     Config::Any->load_files({files => \@files, filter  => \&filter});
     Config::Any->load_files({files => \@files, use_ext => 1});
 
@@ -74,6 +74,13 @@ arrayref of plugin names like C<Config::Any::INI>. Its intended use is to allow 
 of a non-standard file extension while forcing it to be offered to a particular parser.
 It is not compatible with 'use_ext'. 
 
+You can supply a C<driver_args> hashref to pass special options to a particular
+parser object. Example:
+
+    Config::Any->load_files( { files => \@files, driver_args => {
+        General => { -LowerCaseNames => 1 }
+    } )
+
 =cut
 
 sub load_files {
@@ -85,7 +92,7 @@ sub load_files {
     }
 
     my %load_args = map { $_ => defined $args->{$_} ? $args->{$_} : undef } 
-        qw(filter use_ext force_plugins);
+        qw(filter use_ext force_plugins driver_args);
     $load_args{files} = [ grep { -f $_ } @{$args->{files}} ];
     return $class->_load(\%load_args);
 }
@@ -114,7 +121,7 @@ sub load_stems {
     }
         
     my %load_args = map { $_ => defined $args->{$_} ? $args->{$_} : undef } 
-        qw(filter use_ext force_plugins);
+        qw(filter use_ext force_plugins driver_args);
 
     my $filenames = $class->_stems_to_files($args->{stems});
     $load_args{files} = [ grep { -f $_ } @{$filenames} ];
@@ -150,7 +157,7 @@ sub _load {
         @{$args}{qw(files filter use_ext force_plugins)};
     croak "_load requires a arrayref of file paths" unless defined $files_ref;
 
-	my %files           = _maphash @$files_ref;
+    my %files           = _maphash @$files_ref;
     my %force_plugins   = _maphash @$force_plugins_ref;
     my $enforcing       = keys %force_plugins ? 1 : 0;
 
@@ -160,33 +167,36 @@ sub _load {
     # perform a separate file loop for each loader
     for my $loader ( $class->plugins ) {
         next if $enforcing && not defined $force_plugins{$loader};
-		last unless keys %files;
+        last unless keys %files;
         my %ext = _maphash $loader->extensions;
 
+        my ($loader_class) = $loader =~ /::([^:]+)$/;
+        my $driver_args = $args->{driver_args}{$loader_class} || {};
+ 
         FILE:
         for my $filename (keys %files) {
             # use file extension to decide whether this loader should try this file
             # use_ext => 1 hits this block
             if (defined $use_ext && !$enforcing) {
-				my $matched_ext = 0;
+                my $matched_ext = 0;
                 EXT:
                 for my $e (keys %ext) {
                     next EXT  unless $filename =~ m{ \. $e \z }xms; 
                     next FILE unless exists $ext{$e};
-					$matched_ext = 1;
+                    $matched_ext = 1;
                 }
 
-				next FILE unless $matched_ext;
+                next FILE unless $matched_ext;
             }
 
             my $config;
-			eval {
-				$config = $loader->load( $filename );
-			};
+            eval {
+                $config = $loader->load( $filename, $driver_args );
+            };
 
-			next if $EVAL_ERROR; # if it croaked or warned, we can't use it
+            next if $EVAL_ERROR; # if it croaked or warned, we can't use it
             next if !$config;
-			delete $files{$filename};
+            delete $files{$filename};
 
             # post-process config with a filter callback, if we got one
             $filter_cb->( $config ) if defined $filter_cb;
@@ -238,7 +248,7 @@ parameter to those methods.
 sub extensions {
     my $class = shift;
     my @ext = map { $_->extensions } $class->plugins;
-	return wantarray ? @ext : [@ext];
+    return wantarray ? @ext : [@ext];
 }
 
 =head1 DIAGNOSTICS
@@ -289,7 +299,7 @@ L<http://rt.cpan.org>.
 
 =head1 AUTHOR
 
-Joel Bernstein  C<< <rataxis@cpan.org> >>
+Joel Bernstein  E<lt>rataxis@cpan.orgE<gt>
 
 =head1 CONTRIBUTORS
 

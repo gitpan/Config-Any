@@ -42,32 +42,33 @@ Attempts to load C<$file> as an XML file.
 sub load {
     my $class = shift;
     my $file  = shift;
+    my $args  = shift || {};
 
     require XML::Simple;
-    XML::Simple->import;
-    my $config = XMLin( 
-		$file, 
-		ForceArray => [ qw( component model view controller ) ],
-	);
+    my $config = XML::Simple::XMLin( 
+        $file, 
+        ForceArray => [ qw( component model view controller ) ],
+        %$args
+    );
 
-	return $class->_coerce($config);
+    return $class->_coerce($config);
 }
 
 sub _coerce {
-	# coerce the XML-parsed config into the correct format
-	my $class = shift;
-	my $config = shift;
-	my $out;
-	for my $k (keys %$config) {
-		my $ref = $config->{$k};
-		my $name = ref $ref ? delete $ref->{name} : undef;
-		if (defined $name) {
-			$out->{$k}->{$name} = $ref;	
-		} else {
-			$out->{$k} = $ref;
-		}
-	}
-	$out;
+    # coerce the XML-parsed config into the correct format
+    my $class = shift;
+    my $config = shift;
+    my $out;
+    for my $k (keys %$config) {
+        my $ref = $config->{$k};
+        my $name = ref $ref ? delete $ref->{name} : undef;
+        if (defined $name) {
+            $out->{$k}->{$name} = $ref; 
+        } else {
+            $out->{$k} = $ref;
+        }
+    }
+    $out;
 }
 
 =head1 AUTHOR
