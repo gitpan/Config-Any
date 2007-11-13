@@ -45,45 +45,54 @@ sub load {
     my $args  = shift || {};
 
     require XML::Simple;
-    my $config = XML::Simple::XMLin( 
-        $file, 
+    my $config = XML::Simple::XMLin(
+        $file,
         ForceArray => [ qw( component model view controller ) ],
         %$args
     );
 
-    return $class->_coerce($config);
+    return $class->_coerce( $config );
 }
 
 sub _coerce {
+
     # coerce the XML-parsed config into the correct format
-    my $class = shift;
+    my $class  = shift;
     my $config = shift;
     my $out;
-    for my $k (keys %$config) {
-        my $ref = $config->{$k};
-        my $name = ref $ref ? delete $ref->{name} : undef;
-        if (defined $name) {
-            $out->{$k}->{$name} = $ref; 
-        } else {
-            $out->{$k} = $ref;
+    for my $k ( keys %$config ) {
+        my $ref = $config->{ $k };
+        my $name = ref $ref ? delete $ref->{ name } : undef;
+        if ( defined $name ) {
+            $out->{ $k }->{ $name } = $ref;
+        }
+        else {
+            $out->{ $k } = $ref;
         }
     }
     $out;
 }
 
-=head1 AUTHOR
+=head2 is_supported( )
 
-=over 4 
+Returns true if L<XML::Simple> is available.
 
-=item * Brian Cassidy E<lt>bricas@cpan.orgE<gt>
+=cut
 
-=item * Joel Bernstein E<lt>rataxis@cpan.orgE<gt>
+sub is_supported {
+    eval { require XML::Simple; };
+    return $@ ? 0 : 1;
+}
 
-=back
+=head1 AUTHORS
+
+Brian Cassidy E<lt>bricas@cpan.orgE<gt>
+
+Joel Bernstein E<lt>rataxis@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2006 by Brian Cassidy
+Copyright 2007 by Brian Cassidy
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

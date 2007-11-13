@@ -48,7 +48,7 @@ sub load {
     close $fh;
 
     eval { require JSON::Syck; };
-    if( $@ ) {
+    if ( $@ ) {
         require JSON;
         return JSON::jsonToObj( $content );
     }
@@ -57,17 +57,26 @@ sub load {
     }
 }
 
+=head2 is_supported( )
+
+Returns true if either L<JSON::Syck> or L<JSON> is available.
+
+=cut
+
+sub is_supported {
+    eval { require JSON::Syck; };
+    return 1 unless $@;
+    eval { require JSON; };
+    return $@ ? 0 : 1;
+}
+
 =head1 AUTHOR
 
-=over 4 
-
-=item * Brian Cassidy E<lt>bricas@cpan.orgE<gt>
-
-=back
+Brian Cassidy E<lt>bricas@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2006 by Brian Cassidy
+Copyright 2007 by Brian Cassidy
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

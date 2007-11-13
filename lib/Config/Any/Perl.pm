@@ -46,7 +46,7 @@ sub load {
     my $file  = shift;
     my $content;
 
-    unless( $content = $cache{ $file } ) {
+    unless ( $content = $cache{ $file } ) {
         $content = eval { require $file };
         $cache{ $file } = $content;
     }
@@ -54,17 +54,23 @@ sub load {
     return $content;
 }
 
+=head2 is_supported( )
+
+Returns true.
+
+=cut
+
+sub is_supported {
+    return 1;
+}
+
 =head1 AUTHOR
 
-=over 4 
-
-=item * Brian Cassidy E<lt>bricas@cpan.orgE<gt>
-
-=back
+Brian Cassidy E<lt>bricas@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2006 by Brian Cassidy
+Copyright 2007 by Brian Cassidy
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

@@ -43,14 +43,14 @@ sub load {
     my $args  = shift || {};
 
     # work around bug (?) in Config::General
-#   return if $class->_test_perl($file);
+    #   return if $class->_test_perl($file);
 
-    $args->{-ConfigFile} = $file;
+    $args->{ -ConfigFile } = $file;
 
     require Config::General;
     my $configfile = Config::General->new( %$args );
     my $config     = { $configfile->getall };
-    
+
     return $config;
 }
 
@@ -61,32 +61,35 @@ sub load {
 # developer.
 
 sub _test_perl {
-    my ($class, $file) = @_;
+    my ( $class, $file ) = @_;
     my $is_perl_src;
     eval { $is_perl_src = do "$file"; };
-    delete $INC{$file}; # so we don't screw stuff later on
+    delete $INC{ $file };    # so we don't screw stuff later on
     return defined $is_perl_src;
+}
+
+=head2 is_supported( )
+
+Returns true if L<Config::General> is available.
+
+=cut
+
+sub is_supported {
+    eval { require Config::General; };
+    return $@ ? 0 : 1;
 }
 
 =head1 AUTHOR
 
-=over 4 
-
-=item * Brian Cassidy E<lt>bricas@cpan.orgE<gt>
-
-=back
+Brian Cassidy E<lt>bricas@cpan.orgE<gt>
 
 =head1 CONTRIBUTORS
 
-=over 4
-
-=item * Joel Bernstein C<< <rataxis@cpan.org> >>
-
-=back
+Joel Bernstein C<< <rataxis@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2006 by Brian Cassidy
+Copyright 2007 by Brian Cassidy
 
 Portions Copyright 2006 Portugal Telecom
 

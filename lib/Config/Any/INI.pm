@@ -46,22 +46,34 @@ sub load {
     require Config::Tiny;
     my $config = Config::Tiny->read( $file );
 
-    my $main   = delete $config->{ _ };
+    my $main = delete $config->{ _ };
     my $out;
-    $out->{$_} = $main->{$_} for keys %$main;
+    $out->{ $_ } = $main->{ $_ } for keys %$main;
 
-    for my $k (keys %$config) {
+    for my $k ( keys %$config ) {
         my @keys = split /\s+/, $k if $MAP_SECTION_SPACE_TO_NESTED_KEY;
-        my $ref = $config->{$k};
+        my $ref = $config->{ $k };
 
-        if (@keys > 1) {
-            my ($a, $b) = @keys[0,1];
-            $out->{$a}->{$b} = $ref;
-        } else {
-            $out->{$k} = $ref;
+        if ( @keys > 1 ) {
+            my ( $a, $b ) = @keys[ 0, 1 ];
+            $out->{ $a }->{ $b } = $ref;
+        }
+        else {
+            $out->{ $k } = $ref;
         }
     }
     return $out;
+}
+
+=head2 is_supported( )
+
+Returns true if L<Config::Tiny> is available.
+
+=cut
+
+sub is_supported {
+    eval { require Config::Tiny; };
+    return $@ ? 0 : 1;
 }
 
 =head1 PACKAGE VARIABLES
@@ -83,19 +95,15 @@ Set it to 0 to preserve literal spaces in section headings:
 
 =back
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-=over 4 
+Brian Cassidy E<lt>bricas@cpan.orgE<gt>
 
-=item * Brian Cassidy E<lt>bricas@cpan.orgE<gt>
-
-=item * Joel Bernstein E<lt>rataxis@cpan.orgE<gt>
-
-=back
+Joel Bernstein E<lt>rataxis@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2006 by Brian Cassidy, portions copyright 2006, 2007 by Joel Bernstein
+Copyright 2007 by Brian Cassidy, portions copyright 2006, 2007 by Joel Bernstein
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

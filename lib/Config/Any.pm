@@ -1,12 +1,12 @@
 package Config::Any;
-# $Id: $
-use warnings;
+
 use strict;
+use warnings;
+
 use Carp;
 use Module::Pluggable::Object ();
-use English qw(-no_match_vars);
 
-our $VERSION = '0.08';
+our $VERSION = '0.09_01';
 
 =head1 NAME
 
@@ -14,7 +14,7 @@ Config::Any - Load configuration from different file formats, transparently
 
 =head1 VERSION
 
-This document describes Config::Any version 0.0.8
+This document describes Config::Any version 0.09_01
 
 =head1 SYNOPSIS
 
@@ -48,11 +48,11 @@ configuration formats.
 
 =cut
 
-=head2 load_files( )
+=head2 load_files( \%args )
 
-    Config::Any->load_files({files => \@files});
-    Config::Any->load_files({files => \@files, filter  => \&filter});
-    Config::Any->load_files({files => \@files, use_ext => 1});
+    Config::Any->load_files( { files => \@files } );
+    Config::Any->load_files( { files => \@files, filter  => \&filter } );
+    Config::Any->load_files( { files => \@files, use_ext => 1 } );
 
 C<load_files()> attempts to load configuration from the list of files passed in
 the C<files> parameter, if the file exists.
@@ -84,24 +84,21 @@ parser object. Example:
 =cut
 
 sub load_files {
-    my ($class, $args) = @_;
-    return unless defined $args;
-    unless (exists $args->{files}) {
-        warn "no files specified";
+    my ( $class, $args ) = @_;
+
+    unless ( $args && exists $args->{ files } ) {
+        warn "No files specified!";
         return;
     }
 
-    my %load_args = map { $_ => defined $args->{$_} ? $args->{$_} : undef } 
-        qw(filter use_ext force_plugins driver_args);
-    $load_args{files} = [ grep { -f $_ } @{$args->{files}} ];
-    return $class->_load(\%load_args);
+    return $class->_load( $args );
 }
 
-=head2 load_stems( )
+=head2 load_stems( \%args )
 
-    Config::Any->load_stems({stems => \@stems]});
-    Config::Any->load_stems({stems => \@stems, filter  => \&filter});
-    Config::Any->load_stems({stems => \@stems, use_ext => 1});
+    Config::Any->load_stems( { stems => \@stems } );
+    Config::Any->load_stems( { stems => \@stems, filter  => \&filter } );
+    Config::Any->load_stems( { stems => \@stems, use_ext => 1 } );
 
 C<load_stems()> attempts to load configuration from a list of files which it generates
 by combining the filename stems list passed in the C<stems> parameter with the 
@@ -113,98 +110,94 @@ parameters. Please read the C<load_files()> documentation before using this meth
 =cut
 
 sub load_stems {
-    my ($class, $args) = @_;
-    return unless defined $args;
-    unless (exists $args->{stems}) {
-        warn "no stems specified";
+    my ( $class, $args ) = @_;
+
+    unless ( $args && exists $args->{ stems } ) {
+        warn "No stems specified!";
         return;
     }
-        
-    my %load_args = map { $_ => defined $args->{$_} ? $args->{$_} : undef } 
-        qw(filter use_ext force_plugins driver_args);
 
-    my $filenames = $class->_stems_to_files($args->{stems});
-    $load_args{files} = [ grep { -f $_ } @{$filenames} ];
-    return $class->_load(\%load_args);
-}
-
-sub _stems_to_files {
-    my ($class, $stems) = @_;
-    return unless defined $stems;
-
+    my $stems = delete $args->{ stems };
     my @files;
-    STEM:
-    for my $s (@$stems) {
-        EXT:
-        for my $ext ($class->extensions) {
-            my $file = "$s.$ext";
-            next EXT unless -f $file;
-            push @files, $file;
-            last EXT;
+    for my $s ( @$stems ) {
+        for my $ext ( $class->extensions ) {
+            push @files, "$s.$ext";
         }
     }
-    \@files;
+
+    $args->{ files } = \@files;
+    return $class->_load( $args );
 }
 
-sub _maphash (@) { map { $_ => 1 } @_ } # sugar
-
-# this is where we do the real work
-# it's a private class-method because users should use the interface described
-# in the POD.
 sub _load {
-    my ($class, $args) = @_;
-    my ($files_ref, $filter_cb, $use_ext, $force_plugins_ref) = 
-        @{$args}{qw(files filter use_ext force_plugins)};
-    croak "_load requires a arrayref of file paths" unless defined $files_ref;
+    my ( $class, $args ) = @_;
+    croak "_load requires a arrayref of file paths" unless $args->{ files };
 
-    my %files           = _maphash @$files_ref;
-    my %force_plugins   = _maphash @$force_plugins_ref;
-    my $enforcing       = keys %force_plugins ? 1 : 0;
+    my $force = defined $args->{ force_plugins };
+    if ( !$force and !defined $args->{ use_ext } ) {
+        warn
+            "use_ext argument was not explicitly set, as of 0.09, this is true by default";
+        $args->{ use_ext } = 1;
+    }
 
-    my $final_configs       = [];
-    my $originally_loaded   = {};
+    # figure out what plugins we're using
+    my @plugins = $force ? @{ $args->{ force_plugins } } : $class->plugins;
 
-    # perform a separate file loop for each loader
-    for my $loader ( $class->plugins ) {
-        next if $enforcing && not defined $force_plugins{$loader};
-        last unless keys %files;
-        my %ext = _maphash $loader->extensions;
+    # map extensions if we have to
+    my ( %extension_lut, $extension_re );
+    my $use_ext_lut = !$force && $args->{ use_ext };
+    if ( $use_ext_lut ) {
+        for my $plugin ( @plugins ) {
+            $extension_lut{ $_ } = $plugin for $plugin->extensions;
+        }
 
-        my ($loader_class) = $loader =~ /::([^:]+)$/;
-        my $driver_args = $args->{driver_args}{$loader_class} || {};
- 
-        FILE:
-        for my $filename (keys %files) {
-            # use file extension to decide whether this loader should try this file
-            # use_ext => 1 hits this block
-            if (defined $use_ext && !$enforcing) {
-                my $matched_ext = 0;
-                EXT:
-                for my $e (keys %ext) {
-                    next EXT  unless $filename =~ m{ \. $e \z }xms; 
-                    next FILE unless exists $ext{$e};
-                    $matched_ext = 1;
-                }
+        $extension_re = join( '|', keys %extension_lut );
+    }
 
-                next FILE unless $matched_ext;
+    # map args to plugins
+    my $base_class = __PACKAGE__;
+    my %loader_args;
+    for my $plugin ( @plugins ) {
+        $plugin =~ m{^$base_class\::(.+)};
+        $loader_args{ $plugin } = $args->{ driver_args }->{ $1 } || {};
+    }
+
+    my @results;
+
+    for my $filename ( @{ $args->{ files } } ) {
+
+        # don't even bother if it's not there
+        next unless -f $filename;
+
+        my @try_plugins = @plugins;
+
+        if ( $use_ext_lut ) {
+            $filename =~ m{\.($extension_re)\z};
+            next unless $1;
+            @try_plugins = $extension_lut{ $1 };
+        }
+
+        for my $loader ( @try_plugins ) {
+            next unless $loader->is_supported;
+            my @configs
+                = eval { $loader->load( $filename, $loader_args{ $loader } ); };
+
+            # fatal error if we used extension matching
+            croak "Error parsing file: $filename" if $@ and $use_ext_lut;
+            next if $@ or !@configs;
+
+            # post-process config with a filter callback
+            if ( $args->{ filter } ) {
+                $args->{ filter }->( $_ ) for @configs;
             }
 
-            my $config;
-            eval {
-                $config = $loader->load( $filename, $driver_args );
-            };
-
-            next if $EVAL_ERROR; # if it croaked or warned, we can't use it
-            next if !$config;
-            delete $files{$filename};
-
-            # post-process config with a filter callback, if we got one
-            $filter_cb->( $config ) if defined $filter_cb;
-
-            push @$final_configs, { $filename => $config };
+            push @results,
+                { $filename => @configs == 1 ? $configs[ 0 ] : \@configs };
+            last;
         }
     }
-    $final_configs;
+
+    return \@results;
 }
 
 =head2 finder( )
@@ -217,12 +210,12 @@ more information.
 =cut
 
 sub finder {
-    my $class = shift;
+    my $class  = shift;
     my $finder = Module::Pluggable::Object->new(
         search_path => [ __PACKAGE__ ],
         require     => 1
     );
-    $finder;
+    return $finder;
 }
 
 =head2 plugins( )
@@ -248,14 +241,14 @@ parameter to those methods.
 sub extensions {
     my $class = shift;
     my @ext = map { $_->extensions } $class->plugins;
-    return wantarray ? @ext : [@ext];
+    return wantarray ? @ext : \@ext;
 }
 
 =head1 DIAGNOSTICS
 
 =over
 
-=item C<no files specified> or C<no stems specified>
+=item C<No files specified!> or C<No stems specified!>
 
 The C<load_files()> and C<load_stems()> methods will issue this warning if
 called with an empty list of files/stems to load.

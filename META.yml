@@ -1,8 +1,11 @@
 --- 
 abstract: Load configuration from different file formats, transparently
-author: Joel Bernstein  <rataxis@cpan.org>
+author: 
+  - Joel Bernstein  <rataxis@cpan.org>
+build_requires: 
+  Test::More: 0
 distribution_type: module
-generated_by: Module::Install version 0.67
+generated_by: Module::Install version 0.68
 license: perl
 meta-spec: 
   url: http://module-build.sourceforge.net/META-spec-v1.3.html
@@ -14,6 +17,4 @@ no_index:
     - t
 requires: 
   Module::Pluggable: 3.01
-  Test::More: 0
-  version: 0
-version: 0.08
+version: 0.09_01

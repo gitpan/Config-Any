@@ -3,7 +3,7 @@ NAME
     transparently
 
 VERSION
-    This document describes Config::Any version 0.0.8
+    This document describes Config::Any version 0.09_01
 
 SYNOPSIS
         use Config::Any;
@@ -34,10 +34,10 @@ DESCRIPTION
     the power of different configuration formats.
 
 INTERFACE
-  load_files( )
-        Config::Any->load_files({files => \@files});
-        Config::Any->load_files({files => \@files, filter  => \&filter});
-        Config::Any->load_files({files => \@files, use_ext => 1});
+  load_files( \%args )
+        Config::Any->load_files( { files => \@files } );
+        Config::Any->load_files( { files => \@files, filter  => \&filter } );
+        Config::Any->load_files( { files => \@files, use_ext => 1 } );
 
     "load_files()" attempts to load configuration from the list of files
     passed in the "files" parameter, if the file exists.
@@ -68,10 +68,10 @@ INTERFACE
             General => { -LowerCaseNames => 1 }
         } )
 
-  load_stems( )
-        Config::Any->load_stems({stems => \@stems]});
-        Config::Any->load_stems({stems => \@stems, filter  => \&filter});
-        Config::Any->load_stems({stems => \@stems, use_ext => 1});
+  load_stems( \%args )
+        Config::Any->load_stems( { stems => \@stems } );
+        Config::Any->load_stems( { stems => \@stems, filter  => \&filter } );
+        Config::Any->load_stems( { stems => \@stems, use_ext => 1 } );
 
     "load_stems()" attempts to load configuration from a list of files which
     it generates by combining the filename stems list passed in the "stems"
@@ -96,7 +96,7 @@ INTERFACE
     useful if you set the "use_ext" parameter to those methods.
 
 DIAGNOSTICS
-    "no files specified" or "no stems specified"
+    "No files specified!" or "No stems specified!"
         The "load_files()" and "load_stems()" methods will issue this
         warning if called with an empty list of files/stems to load.
 

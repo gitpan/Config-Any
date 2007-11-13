@@ -42,7 +42,7 @@ sub load {
     my $file  = shift;
 
     eval { require YAML::Syck; };
-    if( $@ ) {
+    if ( $@ ) {
         require YAML;
         return YAML::LoadFile( $file );
     }
@@ -54,17 +54,26 @@ sub load {
     }
 }
 
+=head2 is_supported( )
+
+Returns true if either L<YAML::Syck> or L<YAML> is available.
+
+=cut
+
+sub is_supported {
+    eval { require YAML::Syck; };
+    return 1 unless $@;
+    eval { require YAML; };
+    return $@ ? 0 : 1;
+}
+
 =head1 AUTHOR
 
-=over 4 
-
-=item * Brian Cassidy E<lt>bricas@cpan.orgE<gt>
-
-=back
+Brian Cassidy E<lt>bricas@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2006 by Brian Cassidy
+Copyright 2007 by Brian Cassidy
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

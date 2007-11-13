@@ -31,6 +31,7 @@ t/53-perl.t
 t/54-xml.t
 t/55-yaml.t
 t/61-features.t
+t/62-multi.t
 t/conf/conf.conf
 t/conf/conf.foo
 t/conf/conf.ini
@@ -39,5 +40,6 @@ t/conf/conf.pl
 t/conf/conf.xml
 t/conf/conf.yml
 t/conf/conf2.ini
+t/multi/conf.yml
 t/pod-coverage.t
 t/pod.t
