@@ -6,7 +6,7 @@ use warnings;
 use Carp;
 use Module::Pluggable::Object ();
 
-our $VERSION = '0.09_01';
+our $VERSION = '0.09_02';
 
 =head1 NAME
 
@@ -14,7 +14,7 @@ Config::Any - Load configuration from different file formats, transparently
 
 =head1 VERSION
 
-This document describes Config::Any version 0.09_01
+This document describes Config::Any version 0.09_02
 
 =head1 SYNOPSIS
 
@@ -25,7 +25,7 @@ This document describes Config::Any version 0.09_01
     my $cfg = Config::Any->load_files({files => \@filepaths, ... });
 
     for (@$cfg) {
-        my ($filename, $config) = each %$_;
+        my ($filename, $config) = %$_;
         $class->config($config);
         warn "loaded config from file: $filename";
     }
