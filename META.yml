@@ -17,4 +17,4 @@ no_index:
     - t
 requires: 
   Module::Pluggable: 3.01
-version: 0.09_02
+version: 0.10

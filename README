@@ -3,7 +3,7 @@ NAME
     transparently
 
 VERSION
-    This document describes Config::Any version 0.09_02
+    This document describes Config::Any version 0.10
 
 SYNOPSIS
         use Config::Any;
