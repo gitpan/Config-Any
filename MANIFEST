@@ -40,6 +40,7 @@ t/conf/conf.pl
 t/conf/conf.xml
 t/conf/conf.yml
 t/conf/conf2.ini
+t/conf/subsections.ini
 t/multi/conf.yml
 t/pod-coverage.t
 t/pod.t

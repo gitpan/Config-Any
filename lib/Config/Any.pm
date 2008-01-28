@@ -6,15 +6,11 @@ use warnings;
 use Carp;
 use Module::Pluggable::Object ();
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 NAME
 
 Config::Any - Load configuration from different file formats, transparently
-
-=head1 VERSION
-
-This document describes Config::Any version 0.10
 
 =head1 SYNOPSIS
 

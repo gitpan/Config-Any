@@ -2,9 +2,6 @@ NAME
     Config::Any - Load configuration from different file formats,
     transparently
 
-VERSION
-    This document describes Config::Any version 0.10
-
 SYNOPSIS
         use Config::Any;
 
