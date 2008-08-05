@@ -32,7 +32,6 @@ t/54-xml.t
 t/55-yaml.t
 t/61-features.t
 t/62-multi.t
-t/63-invalid.t
 t/conf/conf.conf
 t/conf/conf.foo
 t/conf/conf.ini
@@ -41,8 +40,13 @@ t/conf/conf.pl
 t/conf/conf.xml
 t/conf/conf.yml
 t/conf/conf2.ini
-t/conf/conf_invalid.pl
 t/conf/subsections.ini
+t/invalid/conf.conf
+t/invalid/conf.ini
+t/invalid/conf.json
+t/invalid/conf.pl
+t/invalid/conf.xml
+t/invalid/conf.yml
 t/multi/conf.yml
 t/pod-coverage.t
 t/pod.t

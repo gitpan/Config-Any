@@ -6,7 +6,7 @@ use warnings;
 use Carp;
 use Module::Pluggable::Object ();
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 =head1 NAME
 
@@ -49,6 +49,7 @@ configuration formats.
     Config::Any->load_files( { files => \@files } );
     Config::Any->load_files( { files => \@files, filter  => \&filter } );
     Config::Any->load_files( { files => \@files, use_ext => 1 } );
+    Config::Any->load_files( { files => \@files, flatten_to_hash => 1 } );
 
 C<load_files()> attempts to load configuration from the list of files passed in
 the C<files> parameter, if the file exists.
@@ -64,6 +65,9 @@ file extension will be used. For efficiency reasons, its use is encouraged, but
 be aware that you will lose flexibility -- for example, a file called C<myapp.cfg> 
 containing YAML data will not be offered to the YAML plugin, whereas C<myapp.yml>
 or C<myapp.yaml> would be.
+
+When the C<flatten_to_hash> parameter is defined, the loader will return a hash
+keyed on the file names, as opposed to the usual list of single-key hashes.
 
 C<load_files()> also supports a 'force_plugins' parameter, whose value should be an
 arrayref of plugin names like C<Config::Any::INI>. Its intended use is to allow the use 
@@ -95,6 +99,7 @@ sub load_files {
     Config::Any->load_stems( { stems => \@stems } );
     Config::Any->load_stems( { stems => \@stems, filter  => \&filter } );
     Config::Any->load_stems( { stems => \@stems, use_ext => 1 } );
+    Config::Any->load_stems( { stems => \@stems, flatten_to_hash => 1 } );
 
 C<load_stems()> attempts to load configuration from a list of files which it generates
 by combining the filename stems list passed in the C<stems> parameter with the 
@@ -179,7 +184,7 @@ sub _load {
                 = eval { $loader->load( $filename, $loader_args{ $loader } ); };
 
             # fatal error if we used extension matching
-            croak "Error parsing file: $filename" if $@ and $use_ext_lut;
+            croak "Error parsing $filename: $@" if $@ and $use_ext_lut;
             next if $@ or !@configs;
 
             # post-process config with a filter callback
@@ -191,6 +196,11 @@ sub _load {
                 { $filename => @configs == 1 ? $configs[ 0 ] : \@configs };
             last;
         }
+    }
+
+    if ( defined $args->{ flatten_to_hash } ) {
+        my %flattened = map { %$_ } @results;
+        return \%flattened;
     }
 
     return \@results;
@@ -288,7 +298,7 @@ L<http://rt.cpan.org>.
 
 =head1 AUTHOR
 
-Joel Bernstein  E<lt>rataxis@cpan.orgE<gt>
+Joel Bernstein E<lt>rataxis@cpan.orgE<gt>
 
 =head1 CONTRIBUTORS
 
