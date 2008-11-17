@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 
+# use Test::Without::Module qw(YAML YAML::Syck Config::General XML::Simple JSON JSON::Syck Config::Tiny );
 use Test::More tests => 10;
 
 use_ok( 'Config::Any' );
@@ -38,11 +39,11 @@ use_ok( 'Config::Any' );
     );
 }
 
-# grep out files we don't understand for these tests
-my @files = grep { !m{\.(foo|unsupported)$} } glob( "t/conf/conf.*" );
-my $filter = sub { return };
+my @files = glob( "t/supported/conf.*" );
 ok( Config::Any->load_files( { files => \@files, use_ext => 0 } ),
     "use_ext 0 works" );
+
+my $filter = sub { return };
 ok( Config::Any->load_files( { files => \@files, use_ext => 1 } ),
     "use_ext 1 works" );
 
@@ -61,6 +62,6 @@ eval {
 };
 ok( $@, "filter breaks" );
 
-my @stems = qw(t/conf/conf);
+my @stems = qw(t/supported/conf);
 ok( Config::Any->load_stems( { stems => \@stems, use_ext => 1 } ),
     "load_stems with stems works" );

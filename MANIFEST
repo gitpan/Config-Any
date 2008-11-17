@@ -55,3 +55,4 @@ t/lib/Config/Any/Unsupported.pm
 t/multi/conf.yml
 t/pod-coverage.t
 t/pod.t
+t/supported/conf.pl
