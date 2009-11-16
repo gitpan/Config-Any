@@ -1,11 +1,8 @@
 Changes
-inc/Module/AutoInstall.pm
 inc/Module/Install.pm
-inc/Module/Install/AutoInstall.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm
 inc/Module/Install/Fetch.pm
-inc/Module/Install/Include.pm
 inc/Module/Install/Makefile.pm
 inc/Module/Install/Metadata.pm
 inc/Module/Install/Win32.pm
@@ -35,6 +32,7 @@ t/61-features.t
 t/62-multi.t
 t/63-unsupported.t
 t/64-extfail.t
+t/65-force_plugins.t
 t/conf/conf.conf
 t/conf/conf.foo
 t/conf/conf.ini
@@ -44,6 +42,7 @@ t/conf/conf.unsupported
 t/conf/conf.xml
 t/conf/conf.yml
 t/conf/conf2.ini
+t/conf/conf_arrayref.xml
 t/conf/subsections.ini
 t/invalid/conf.conf
 t/invalid/conf.ini

@@ -5,6 +5,8 @@ use warnings;
 
 use base 'Config::Any::Base';
 
+use Carp ();
+
 =head1 NAME
 
 Config::Any::YAML - Load YAML config files
@@ -43,6 +45,15 @@ sub load {
     my $class = shift;
     my $file  = shift;
 
+    eval { require YAML::XS };
+    unless ( $@ ) {
+        return YAML::XS::LoadFile( $file );
+    }
+
+    Carp::carp
+        'Use of YAML::Syck or YAML to parse config files is DEPRECATED. '
+        . 'Please install YAML::XS for proper YAML support';
+
     eval { require YAML::Syck; YAML::Syck->VERSION( '0.70' ) };
     unless ( $@ ) {
         open( my $fh, $file ) or die $!;
@@ -57,12 +68,12 @@ sub load {
 
 =head2 requires_any_of( )
 
-Specifies that this modules requires one of L<YAML::Syck> (0.70) or L<YAML> in 
-order to work.
+Specifies that this modules requires one of L<YAML::XS>, L<YAML::Syck> (0.70) or
+L<YAML> in order to work.
 
 =cut
 
-sub requires_any_of { [ 'YAML::Syck', '0.70' ], 'YAML' }
+sub requires_any_of { 'YAML::XS', [ 'YAML::Syck', '0.70' ], 'YAML' }
 
 =head1 AUTHOR
 
@@ -70,7 +81,7 @@ Brian Cassidy E<lt>bricas@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2007 by Brian Cassidy
+Copyright 2006-2009 by Brian Cassidy
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 
@@ -82,6 +93,8 @@ it under the same terms as Perl itself.
 =item * L<Catalyst>
 
 =item * L<Config::Any>
+
+=item * L<YAML::XS>
 
 =item * L<YAML>
 
