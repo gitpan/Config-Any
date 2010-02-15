@@ -5,8 +5,6 @@ use warnings;
 
 use base 'Config::Any::Base';
 
-my %cache;
-
 =head1 NAME
 
 Config::Any::Perl - Load Perl config files
@@ -46,12 +44,14 @@ Attempts to load C<$file> as a Perl file.
 sub load {
     my $class = shift;
     my $file  = shift;
-    my $content;
 
-    unless ( $content = $cache{ $file } ) {
-        $content = require $file;
-        $cache{ $file } = $content;
+    my( $exception, $content );
+    {
+        local $@;
+        $content = do $file;
+        $exception = $@;
     }
+    die $exception if $exception;
 
     return $content;
 }
@@ -62,7 +62,7 @@ Brian Cassidy E<lt>bricas@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2006-2009 by Brian Cassidy
+Copyright 2006-2010 by Brian Cassidy
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 
