@@ -43,6 +43,7 @@ t/conf/conf.xml
 t/conf/conf.yml
 t/conf/conf2.ini
 t/conf/conf_arrayref.xml
+t/conf/single_element_arrayref.conf
 t/conf/subsections.ini
 t/invalid/conf.conf
 t/invalid/conf.ini
