@@ -24,4 +24,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://git.shadowcat.co.uk/p5sagit/Config-Any.git
-version: 0.22
+version: 0.23
